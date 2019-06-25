@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><unload unload_date="2019-06-25 14:48:49">
+<sys_remote_update_set action="INSERT_OR_UPDATE">
+<application display_value="Global">global</application>
+<application_name>Global</application_name>
+<application_scope>global</application_scope>
+<application_version/>
+<collisions/>
+<commit_date/>
+<deleted/>
+<description/>
+<inserted/>
+<name>ThousandEyes Listener Transfom Script</name>
+<origin_sys_id/>
+<parent display_value=""/>
+<release_date/>
+<remote_base_update_set display_value=""/>
+<remote_parent_id/>
+<remote_sys_id>5dde4c0ddb9af3008445f9e13996191b</remote_sys_id>
+<state>loaded</state>
+<summary/>
+<sys_class_name>sys_remote_update_set</sys_class_name>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2019-06-25 14:48:49</sys_created_on>
+<sys_id>9f2f404ddb9af3008445f9e13996190f</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2019-06-25 14:48:49</sys_updated_on>
+<update_set display_value=""/>
+<update_source display_value=""/>
+<updated/>
+</sys_remote_update_set>
+<sys_update_xml action="INSERT_OR_UPDATE">
+<action>INSERT_OR_UPDATE</action>
+<application display_value="Global">global</application>
+<category>customer</category>
+<comments/>
+<name>em_connector_push_8efe6e20db9ab3008445f9e139961959</name>
+<payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="em_connector_push"&gt;&lt;em_connector_push action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;description&gt;Transform script to handle incoming events from ThousandEyes &lt;/description&gt;&lt;header_name&gt;user-agent&lt;/header_name&gt;&lt;header_value&gt;thousandeyes&lt;/header_value&gt;&lt;mid_server_script_include/&gt;&lt;name&gt;ThousandEyes Events Transform Script&lt;/name&gt;&lt;order&gt;100&lt;/order&gt;&lt;script&gt;&lt;![CDATA[(function process(/*RESTAPIRequest*/ request, body) {
+	gs.info('ThousandEyes processor, body: ' + body );
+	//gs.info('ThousandEyes processor, headers: ' + JSON.stringify(request.headers));
+	try {
+		var requestBody = JSON.parse(body);
+		
+		var source = 'ThousandEyes';
+		var type = requestBody.alert.type;
+		//gs.info('ThousandEyes processor, type: '+ type);
+		var resource = requestBody.alert.testName;
+		//gs.info('ThousandEyes processor, resource: '+ resource);		
+		var metric_name = requestBody.alert.ruleName; 
+		//gs.info('ThousandEyes processor, metric_name: '+ metric_name);
+		var event_class =  'ThousandEyes';
+		var message_key = requestBody.alert.alertId;
+		//gs.info('ThousandEyes processor, message_key: '+ message_key);
+		var severity = requestBody.eventType;
+		//gs.info('ThousandEyes processor, severity: '+ type);
+		if(severity == 'ALERT_NOTIFICATION_CLEAR')
+			severity = '0'; // Clear Event
+		else {
+			severity = '3'; // Minor Event by default
+		}		
+		var resolutionState = 'New';
+		var description = requestBody.alert.ruleExpression + ' : ' + requestBody.alert.agents[0].metricsAtStart;
+		//gs.info('ThousandEyes processor, description: '+ description);		
+		
+		// Skip the event record if it's a test
+		if ( type != "WEBHOOK_TEST") 
+		{
+			//Create the new event record
+			var gr = new GlideRecord('em_event');
+			gr.initialize();
+			gr.source = source;
+			gr.type = type;
+			gr.resource = resource;
+			gr.metric_name = metric_name;
+			gr.event_class = event_class;
+			gr.message_key = message_key;
+			gr.severity = severity;
+			gr.resolution_state = resolutionState;
+			gr.time_of_event = new GlideDateTime();
+			gr.description = description;
+
+			// Prepare additional_info JSON
+			var additional_info = JSON.stringify(requestBody);
+			gr.additional_info = additional_info;
+
+			gr.insert();
+		}
+		
+	} catch (er) {
+		gs.log(er);
+		status=500;
+		return er;
+	}
+	return "success";
+})(request, body);]]&gt;&lt;/script&gt;&lt;source&gt;thousandeyes&lt;/source&gt;&lt;sys_class_name&gt;em_connector_push&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2019-06-24 13:10:00&lt;/sys_created_on&gt;&lt;sys_id&gt;8efe6e20db9ab3008445f9e139961959&lt;/sys_id&gt;&lt;sys_mod_count&gt;28&lt;/sys_mod_count&gt;&lt;sys_name&gt;ThousandEyes Events Transform Script&lt;/sys_name&gt;&lt;sys_package display_value="Global" source="global"&gt;global&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;&lt;sys_update_name&gt;em_connector_push_8efe6e20db9ab3008445f9e139961959&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2019-06-25 14:48:10&lt;/sys_updated_on&gt;&lt;type&gt;1&lt;/type&gt;&lt;/em_connector_push&gt;&lt;/record_update&gt;</payload>
+<payload_hash>-942755165</payload_hash>
+<remote_update_set display_value="ThousandEyes Listener Transfom Script">9f2f404ddb9af3008445f9e13996190f</remote_update_set>
+<replace_on_upgrade>false</replace_on_upgrade>
+<sys_created_by>admin</sys_created_by>
+<sys_created_on>2019-06-25 14:48:49</sys_created_on>
+<sys_id>d32f404ddb9af3008445f9e139961910</sys_id>
+<sys_mod_count>0</sys_mod_count>
+<sys_recorded_at>16b8f1bc5380000001</sys_recorded_at>
+<sys_updated_by>admin</sys_updated_by>
+<sys_updated_on>2019-06-25 14:48:49</sys_updated_on>
+<table/>
+<target_name>ThousandEyes Events Transform Script</target_name>
+<type>Listener Transform Scripts</type>
+<update_domain>global</update_domain>
+<update_guid>f90f8c499a9af3001f8f7c5df387059a</update_guid>
+<update_guid_history>f90f8c499a9af3001f8f7c5df387059a:-942755165,1ece37b4925af30095a9994ae9d089d9:-162220567,991e77b4165af300e1656c1ea67c4a7a:-266279171,318c37b4585af3006edca1f16672d4d7:-102231917,08a66bbc9f1af300e50a336c6b6955b2:1706743917,7e86a3fc601af300925db1c9a87b32b1:1321624589,2566a3b4db1af300cb8fb346e420cfc5:1706743917,d04663bcab1af30089669586e783a6ae:1663660173,81c52f7c0e1af3002dc06631fc0f6e79:684055904,9a6857b0b01af3009ce0609577f010c6:-96731068,66058bfca696f300ba6f9a057396d4b3:1714328980,37d443b00ad6f3006d865e6973b89012:-2044374618,374136f00396f300c66169dd3c2b952d:-1000933960,10213e70d496f30044f381faf2b6eaa2:1047680535,8601f2703396f300c57b273bfa98ae5d:1153912025,ed2f2e706f96f3008402941744f0a39c:681518068,c87ad7205c1eb3009a1d1308c806a193:-60894108,f7f953600e1eb30042beac04ad36173f:584851888,97a45360961eb3000aa5b72036b81336:-230676099,84a3d7a04cdab30026eebf11d90740c0:1744333183,9a935360571eb300761d5953e65cb633:1963191455,55135fe0cadab300a7e69ff23c61edd6:200481025,dda14fe0ccdab3003740e557506639cf:2058299073,748f7aa42d9ab300748efcfa27a9eab1:1660559856,8b1c326ccb9ab30080760512bde100ac:379801270,c6f7fe2c119ab30020ff341a57d6f9d2:2075095633,6b0f6e20749ab30033bcd8f710ebc35d:1544711787,410f2e204f9ab300f035e9676821cd71:343024754,cefe6e200b9ab300635a3174b450615a:47095707</update_guid_history>
+<update_set display_value=""/>
+<view/>
+</sys_update_xml>
+</unload>
